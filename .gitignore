@@ -1,0 +1,6 @@
+*.suo
+MarkdownSharp/app.config
+MarkdownSharp/bin/*
+MarkdownSharp/obj/*
+MarkdownSharpTests/bin/*
+MarkdownSharpTests/obj/*

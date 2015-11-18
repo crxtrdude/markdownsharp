@@ -415,6 +415,8 @@ namespace MarkdownSharp
 
             text = EncodeAmpsAndAngles(text);
             text = DoItalicsAndBold(text);
+            // C. Canalita - Added the strikethrough parser
+            text = DoStrikethrough(text);
             text = DoHardBreaks(text);
 
             return text;
@@ -1399,6 +1401,26 @@ namespace MarkdownSharp
                 text = _bold.Replace(text, "<strong>$2</strong>");
                 text = _italic.Replace(text, "<em>$2</em>");
             }
+            return text;
+        }
+
+        /// <summary>
+		/// C. Canalita - A working strikethrough markdown regex for MarkdownSharp
+        /// 11-18-2015
+		/// <summary>
+
+        private static Regex _strikeEd = new Regex(@"(\~\~) (?=\S) (.+?[\~]*) (?<=\S) \1", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Turn Markdown ~~strikethroughs~~ into HTML del tags
+        /// </summary>
+        private string DoStrikethrough(string text)
+        {
+            if (!(text.Contains("~")))
+                return text;
+			
+			// similar to the Github markdown implementation.
+			text = _strikeEd.Replace(text, "<del>$2</del>");
             return text;
         }
 
