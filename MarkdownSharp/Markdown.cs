@@ -92,7 +92,7 @@ using System.Text.RegularExpressions;
 namespace MarkdownSharp
 {
 
-    public class MarkdownOptions
+    public class MarkdownOptions : IMarkdownOptions
     {
         /// <summary>
         /// when true, (most) bare plain URLs are auto-hyperlinked  
@@ -103,7 +103,7 @@ namespace MarkdownSharp
         /// when true, RETURN becomes a literal newline  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        public bool AutoNewlines { get; set; }
+        public bool AutoNewLines { get; set; }
         /// <summary>
         /// use ">" for HTML output, or " />" for XHTML output
         /// </summary>
@@ -118,12 +118,44 @@ namespace MarkdownSharp
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
         public bool StrictBoldItalic { get; set; }
-
         /// <summary>
         /// when true, asterisks may be used for intraword emphasis
         /// this does nothing if StrictBoldItalic is false
         /// </summary>
         public bool AsteriskIntraWordEmphasis { get; set; }
+    }
+
+    public interface IMarkdownOptions
+    {
+        /// <summary>
+        /// when true, (most) bare plain URLs are auto-hyperlinked  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        bool AutoHyperlink { get; }
+        /// <summary>
+        /// when true, RETURN becomes a literal newline  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        bool AutoNewLines { get; }
+        /// <summary>
+        /// use ">" for HTML output, or " />" for XHTML output
+        /// </summary>
+        string EmptyElementSuffix { get; }
+        /// <summary>
+        /// when false, email addresses will never be auto-linked  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        bool LinkEmails { get; }
+        /// <summary>
+        /// when true, bold and italic require non-word characters on either side  
+        /// WARNING: this is a significant deviation from the markdown spec
+        /// </summary>
+        bool StrictBoldItalic { get; }
+        /// <summary>
+        /// when true, asterisks may be used for intraword emphasis
+        /// this does nothing if StrictBoldItalic is false
+        /// </summary>
+        bool AsteriskIntraWordEmphasis { get; }
     }
 
 
@@ -143,6 +175,20 @@ namespace MarkdownSharp
         /// </summary>
         public Markdown() : this(false)
         {
+        }
+		
+		/// <summary>
+		///     Create a new Markdown instance and optionally load options from the supplied
+        ///     options parameter.
+		/// </summary>
+        public Markdown(IMarkdownOptions options)
+        {
+            _autoHyperlink = options.AutoHyperlink;
+            _autoNewlines = options.AutoNewLines;
+            _emptyElementSuffix = options.EmptyElementSuffix;
+            _linkEmails = options.LinkEmails;
+            _strictBoldItalic = options.StrictBoldItalic;
+            _asteriskIntraWordEmphasis = options.AsteriskIntraWordEmphasis;
         }
 
         /// <summary>
@@ -169,7 +215,7 @@ namespace MarkdownSharp
                     case "Markdown.AutoHyperlink":
                         _autoHyperlink = Convert.ToBoolean(settings[key]);
                         break;
-                    case "Markdown.AutoNewlines":
+                    case "Markdown.AutoNewLines":
                         _autoNewlines = Convert.ToBoolean(settings[key]);
                         break;
                     case "Markdown.EmptyElementSuffix":
@@ -188,18 +234,22 @@ namespace MarkdownSharp
             }
         }
 
+        public IMarkdownOptions Options { get; set; }
+
+        /*
         /// <summary>
         /// Create a new Markdown instance and set the options from the MarkdownOptions object.
         /// </summary>
-        public Markdown(MarkdownOptions options)
+        public Markdown (MarkdownOptions Options)
         {
-            _autoHyperlink = options.AutoHyperlink;
-            _autoNewlines = options.AutoNewlines;
-            _emptyElementSuffix = options.EmptyElementSuffix;
-            _linkEmails = options.LinkEmails;
-            _strictBoldItalic = options.StrictBoldItalic;
-            _asteriskIntraWordEmphasis = options.AsteriskIntraWordEmphasis;
+            _autoHyperlink = Options.AutoHyperlink;
+            _autoNewlines = Options.AutoNewLines;
+            _emptyElementSuffix = Options.EmptyElementSuffix;
+            _linkEmails = Options.LinkEmails;
+            _strictBoldItalic = Options.StrictBoldItalic;
+            _asteriskIntraWordEmphasis = Options.AsteriskIntraWordEmphasis;
         }
+        */
 
 
         /// <summary>
@@ -1404,10 +1454,8 @@ namespace MarkdownSharp
             return text;
         }
 
-        /// <summary>
-		/// C. Canalita - A working strikethrough markdown regex for MarkdownSharp
-        /// 11-18-2015
-		/// <summary>
+		// C. Canalita - A working strikethrough markdown regex for MarkdownSharp
+        // 11-18-2015
 
         private static Regex _strikeEd = new Regex(@"(\~\~) (?=\S) (.+?[\~]*) (?<=\S) \1", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 

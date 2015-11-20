@@ -1,6 +1,11 @@
+.nuget/*
 *.suo
 MarkdownSharp/app.config
 MarkdownSharp/bin/*
 MarkdownSharp/obj/*
 MarkdownSharpTests/bin/*
 MarkdownSharpTests/obj/*
+MarkdownSharp/*.bak
+MarkdownSharpTests/testfiles/mdtest-1.1/*.actual.html
+MarkdownSharpTests/testfiles/mstest-0.1/*.actual.html
+MarkdownSharpTests/testfiles/php-markdown/*.actual.html
